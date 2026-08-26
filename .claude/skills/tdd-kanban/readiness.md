@@ -10,7 +10,7 @@ Five of the six are **facts** — the skill finds these itself, it does not ask 
 
 3. **The command to run a single test, verified by actually running it.** In this repo that's `npx jest __tests__/<file>.test.js` for a file or `npx jest -t "<test name>"` for one test by name — both confirmed by `scripts/ground.sh` actually executing them, not copied from `CLAUDE.md` on faith.
 
-4. **Existing test conventions, learned by reading 2–3 neighbouring test files.** In this repo: `__tests__/password_checker.test.js` (plain function call, no supertest) and `__tests__/register.test.js` (supertest against the exported `app`, `describe`/`test`, asserts `res.status` and `res.body`). New tests for a route follow the supertest pattern; new tests for a plain module follow the direct-require pattern.
+4. **Existing test conventions, learned by reading 2–3 neighbouring test files.** In this repo: `__tests__/password_checker.test.js` (plain function call, no supertest) and `__tests__/register.test.js` (supertest against the exported `app`, `describe`/`test`, asserts `res.status` and `res.body`). New tests for a route follow the supertest pattern; new tests for a plain module follow the direct-require pattern. Test names follow `should <expected outcome> when <condition>` (see grill.md Q5) — not a bare present-tense description and not prefixed with the `describe` block's title.
 
 5. **Expected value plus provenance.** The value alone isn't enough — where it came from matters just as much. Provenance is limited to four sources:
    - a literal stated in the card or spec,

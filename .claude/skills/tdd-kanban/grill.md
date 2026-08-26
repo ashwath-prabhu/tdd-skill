@@ -10,7 +10,7 @@ Ask in this order because each round can depend on the answer to the round befor
 2. **Seam** — Which public boundary is that observable at? (See [seams.md](seams.md).) e.g. `POST /register` via `request(app)`, or `password_checker.js:checkPasswordStrength` via a direct `require`.
 3. **Reality** — What's real in the test, what's faked? Only system boundaries get faked (see [mocking.md](mocking.md)) — e.g. "real Express app, real in-memory `users` store, no external calls to fake."
 4. **Expected value** — What exactly comes out, **and where did that value come from?** (See readiness item 5 — provenance is mandatory.)
-5. **Slice order** — Which tracer bullet goes first? Smallest observable slice that proves the seam wired correctly, not the whole feature at once.
+5. **Slice order** — Which tracer bullet goes first? Smallest observable slice that proves the seam wired correctly, not the whole feature at once. Name each slice as the literal string that will go inside `test(...)`, in this repo's convention: **`should <expected outcome> when <condition>`** — start with "should", state the observable result (status code and/or shape) before the triggering condition. Not a paraphrase, and not prefixed with the `describe(...)` block's title (that context is already implied by nesting) — e.g. `should return 200 with an empty envelope when no users exist`, not `returns an empty envelope when no users exist` or `GET /users returns an empty envelope when no users exist`. Both `templates/test-plan.md`'s Slices section and `templates/card-comment.md`'s slice list must carry this exact string, so a reviewer can diff the plan against the real test file without translating.
 
 ## Rules
 
