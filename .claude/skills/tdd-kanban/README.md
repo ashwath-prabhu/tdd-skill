@@ -8,6 +8,12 @@ Lives at `.claude/skills/tdd-kanban/` rather than `.claude/skills/tdd/` because 
 
 Paste a card (story, bug, or task) and mention testing/TDD, or explicitly ask to work a card test-first. If you paste nothing, the skill asks for the card once and waits. Typo/copy/config-only changes are waved through without the loop — the skill says so and stops.
 
+Before classifying, the skill orients itself: it checks that the card's behavior plausibly belongs to this repository (a real domain concept, a plausible public seam) before deciding greenfield/retrofit/bugfix. No existing implementation for a behavior is not evidence the card is greenfield — it could just as easily mean the card belongs to a different repository. If relevance can't be established, the skill stops in Orient and presents state-aware choices (wrong repository / correct repository — new domain / correct repository — missing context) via `AskUserQuestion`, instead of guessing or offering to proceed anyway.
+
+The skill enforces eleven mandatory states in order — `INPUT → ORIENT → CLASSIFY → GROUND → READINESS GATE → GRILL → USER CONFIRMATION → TEST PLAN → RED/GREEN LOOP → REVIEW → EMIT` — and never skips ahead. Even "implement this" or "start TDD" right after a card is pasted is treated as permission to begin the workflow (from Orient), not as permission to jump straight to writing code or tests. Whatever slice gets worked first is whatever Grill and the recorded test plan say, never a guess made up front.
+
+Grill is interactive by design: Claude inspects the repo and proposes candidate answers to the 5-question taxonomy, but every answer is confirmed by the user via `AskUserQuestion`, one question at a time — a detailed card supplies candidates, not answers. Once all questions are answered, the skill restates the whole answer set (behavior, seam, reality, expected value, slice order) and asks for one explicit confirmation on the set as a whole before `templates/test-plan.md` is written — that confirmation is its own step, not inferred from having gone along with the individual questions. No test or production code is written before Orient, Classify, Ground, Readiness Gate, Grill, and that test-plan confirmation have all completed.
+
 ## The three modes
 
 - **greenfield** — no code exists yet. Full 5-question grill, then red-green per slice.
@@ -43,7 +49,7 @@ The test plan is the artifact refinement produces; the card comment is the artif
 
 ## Files
 
-- `SKILL.md` — entry point: input → classify → ground → gate → grill → loop → emit → escape hatch.
+- `SKILL.md` — entry point and state machine: input → orient (repository relevance) → classify → ground → readiness gate → grill → user confirmation → test plan → red/green loop → review → emit → escape hatch. States are mandatory, each carries a stated completion condition the next state checks, and none can be skipped forward.
 - `grill.md` — the 5-question taxonomy (behavior, seam, reality, expected value, slice order) and round rules.
 - `readiness.md` — the 6-item gate, all required before the first test.
 - `seams.md` — what a seam is, ranking rules, presentation format for candidates.
