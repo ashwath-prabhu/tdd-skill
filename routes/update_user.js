@@ -1,24 +1,33 @@
 const express = require('express');
 const router = express.Router();
-const { users } = require('./users_store');
+const User = require('../entities/user');
 
-router.put('/users/:id', (req, res) => {
-  const user = users.find((u) => u.id === Number(req.params.id));
+router.put('/users/:id', async (req, res) => {
+  const user = await User.findById(req.params.id);
 
   if (!user) {
     return res.status(404).json({ error: 'user not found' });
   }
 
-  const { name, email } = req.body;
+  const { firstName, lastName, email } = req.body;
 
-  if (!name || !email) {
-    return res.status(400).json({ error: 'name and email are required' });
+  if (!firstName || !email) {
+    return res.status(400).json({ error: 'firstName and email are required' });
   }
 
-  user.name = name;
+  user.firstName = firstName;
+  user.lastName = lastName;
   user.email = email;
+  await user.save();
 
-  return res.status(200).json(user);
+  return res.status(200).json({
+    id: user.userId,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  });
 });
 
 module.exports = router;
