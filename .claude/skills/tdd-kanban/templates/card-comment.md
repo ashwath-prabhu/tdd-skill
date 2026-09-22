@@ -6,13 +6,15 @@ keep the slice list as literal test names, since that's what should show up in t
 **mode:** greenfield
 
 **seams:**
-- `routes/list_users.js` (`GET /users`)
+- `routes/create_data_table.js` (`POST /data-tables`)
 
 **slices (test names, in order):**
-1. `should return 200 with an empty envelope when no users exist`
-2. `should return 200 with all users and their display fields when no page/limit is given`
-3. `should return 200 with a paginated page of users when page/limit are given`
+1. `should return 201 with the created data table when a valid alias is provided`
+2. `should return 400 when alias is missing`
+3. `should return 400 when alias exceeds 32 characters`
+4. `should return 400 when alias contains spaces or special characters`
+5. `should return 409 when alias already exists`
 
-**faked at boundaries:** `entities/user.js` (Mongoose `User` model) — `countDocuments` and `find().skip().limit()` mocked; DB query correctness itself is out of scope for this round.
+**faked at boundaries:** `entities/data_table.js` (Mongoose `DataTable` model) — `create` and `findOne` mocked; DB uniqueness-constraint/query correctness itself is out of scope for this round.
 
-**out of scope for this round (follow-up cards):** sort by first/last name; search by username/first name/email; combined sort+search filter preservation.
+**out of scope for this round (follow-up cards):** CSV→DynamoDB migration of existing data-table data (operational data-migration task, not a testable behavior); enforcing alias immutability on update (no update-data-table endpoint exists yet); "clearly displayed" UI copy communicating the lock (this repo is backend-only — the response's `aliasEditable: false` field is the contract a future frontend would render).

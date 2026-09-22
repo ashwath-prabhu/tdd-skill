@@ -5,6 +5,7 @@ const viewUserRouter = require('./routes/view_user');
 const updateUserRouter = require('./routes/update_user');
 const deleteUserRouter = require('./routes/delete_user');
 const registerRouter = require('./routes/register');
+const createDataTableRouter = require('./routes/create_data_table');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,7 @@ app.use('/', viewUserRouter);
 app.use('/', updateUserRouter);
 app.use('/', deleteUserRouter);
 app.use('/', registerRouter);
+app.use('/', createDataTableRouter);
 
 if (require.main === module) {
   app.listen(PORT, () => {
