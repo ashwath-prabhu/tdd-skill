@@ -9,11 +9,11 @@ No code exists yet for this behavior. Full loop: 5-node grill → plan → red-g
    a. Write the failing test at the agreed seam, with the agreed expected value and its provenance.
    b. Run it with the verified single-test command from readiness item 3. Confirm it fails — and fails for the right reason (missing behavior, not a typo or wrong import).
    c. Write **only enough code** to make that test pass. No speculative branches, no handling for cases the current slice doesn't test.
-   d. Run the single test again. Confirm green. Run the full suite (`npx jest`) to confirm nothing else broke.
+   d. Run the single test again. Confirm green. Run the full suite (the command `scripts/ground.sh` discovered) to confirm nothing else broke.
 3. Move to the next slice from the plan. Repeat step 2 with the next test.
 4. When all slices are green, stop. **Refactoring is not part of this loop** — note refactor candidates for review time (see the `code-review` skill), don't act on them here.
 
-## Worked example on this repo
+## Worked example
 
 Card: add a `'strong'` tier to `password_checker.js:checkPasswordStrength` for 12+ char passwords with mixed case and digits (see the grill worked example in [grill.md](grill.md) for the full round 1).
 

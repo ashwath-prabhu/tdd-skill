@@ -15,7 +15,7 @@ A defect with observable wrong behavior. Reproduce → failing reproduction test
 3. Fix the minimum needed to make that test pass. Don't refactor surrounding code in the same pass.
 4. Run the single test: green. Run the full suite: confirm no regression.
 
-## Worked example on this repo
+## Worked example
 
 Bug: `POST /register` with a `firstName` present never responds — the handler validates `firstName`, and if it's present, falls through with no code after the `if` block, so Express never sends a response and the request hangs.
 

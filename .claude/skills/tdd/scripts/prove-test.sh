@@ -3,6 +3,10 @@
 # restore, confirm it goes green again. Required for retrofit case (a) — a test written
 # against code that already exists, where "it passed" alone proves nothing.
 #
+# Scoped to JS/TS projects. Mutation heuristics are JS-shaped (===/return statements) —
+# this deliberately doesn't try to be a general-purpose mutation testing tool, just a
+# blunt "does the test notice any change to the logic" check.
+#
 # Usage: prove-test.sh <test-file> <source-file>
 #   prove-test.sh __tests__/create_user.test.js routes/create_user.js
 set -euo pipefail
@@ -14,6 +18,17 @@ fi
 
 TEST_FILE="$1"
 SOURCE_FILE="$2"
+
+if grep -q '"vitest"' package.json 2>/dev/null; then
+  TEST_CMD=(npx vitest run "$TEST_FILE")
+elif grep -q '"jest"' package.json 2>/dev/null; then
+  TEST_CMD=(npx jest "$TEST_FILE")
+elif grep -q '"mocha"' package.json 2>/dev/null; then
+  TEST_CMD=(npx mocha "$TEST_FILE")
+else
+  echo "Could not detect jest/vitest/mocha from package.json — defaulting to 'npx jest'." >&2
+  TEST_CMD=(npx jest "$TEST_FILE")
+fi
 
 for f in "$TEST_FILE" "$SOURCE_FILE"; do
   if [ ! -f "$f" ]; then
@@ -31,7 +46,7 @@ restore() {
 trap restore EXIT
 
 echo "== baseline: test should currently be GREEN =="
-if ! npx jest "$TEST_FILE" 2>&1; then
+if ! "${TEST_CMD[@]}" 2>&1; then
   echo "HARD STOP: $TEST_FILE is not green before mutation — fix the test first, this script"
   echo "proves a currently-passing test would catch a regression, not a currently-failing one."
   exit 1
@@ -60,7 +75,7 @@ rm -f "${SOURCE_FILE}.bak"
 
 echo
 echo "== mutated: test should now be RED =="
-if npx jest "$TEST_FILE" 2>&1; then
+if "${TEST_CMD[@]}" 2>&1; then
   echo
   echo "HARD STOP: the test stayed GREEN with the logic gutted. It is not testing the behavior"
   echo "it claims to — strengthen the assertion before trusting this test."
@@ -75,7 +90,7 @@ trap - EXIT
 
 echo
 echo "== restored: test should be GREEN again =="
-if ! npx jest "$TEST_FILE" 2>&1; then
+if ! "${TEST_CMD[@]}" 2>&1; then
   echo "HARD STOP: restore did not bring the test back to green — check $SOURCE_FILE by hand." >&2
   exit 1
 fi

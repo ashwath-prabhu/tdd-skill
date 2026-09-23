@@ -1,6 +1,6 @@
 # Good and Bad Tests
 
-Examples below use this repo's actual framework: Jest 30 + Supertest 7, files in `__tests__/*.test.js`, run with `npx jest`.
+Examples below use Jest + Supertest as an illustrative stand-in; swap in whatever test runner/HTTP client the actual project already uses (discovered via `scripts/ground.sh`) — the principles, not the specific APIs, are what matter.
 
 ## Good tests
 
@@ -21,10 +21,10 @@ describe('POST /users', () => {
 });
 ```
 
-This survives a refactor: if `create_user.js` starts assigning ids from a UUID library, this test only breaks if the response shape actually changes — not because of how the id was generated internally.
+This survives a refactor: if the handler starts assigning ids from a UUID library instead of an in-memory counter, this test only breaks if the response shape actually changes — not because of how the id was generated internally.
 
 ```javascript
-// GOOD — plain-function seam, direct require, matches __tests__/password_checker.test.js's existing style
+// GOOD — plain-function seam, direct require/import
 const { checkPasswordStrength } = require('../password_checker');
 
 test('checkPasswordStrength returns "weak" for a password under 8 characters', () => {
@@ -34,7 +34,7 @@ test('checkPasswordStrength returns "weak" for a password under 8 characters', (
 
 ## Bad tests
 
-**Implementation-coupled** — reaches into `routes/users_store.js` instead of using the HTTP seam:
+**Implementation-coupled** — reaches into a module's internal store instead of using the HTTP seam:
 
 ```javascript
 // BAD — bypasses the interface, couples the test to the store's shape
@@ -56,8 +56,8 @@ test('created user is retrievable via GET /users/:id', async () => {
 **Tautological** — expected value is recomputed the way the code computes it, so it can't disagree with a bug in that computation:
 
 ```javascript
-// BAD — the "expected" id is derived the exact way create_user.js derives it;
-// if create_user.js's id logic is wrong, this test can't catch it
+// BAD — the "expected" id is derived the exact way the handler derives it;
+// if the handler's id logic is wrong, this test can't catch it
 test('creates a user with the next id', async () => {
   const before = (await request(app).get('/users')).body;
   const res = await request(app).post('/users').send({ name: 'Bob', email: 'bob@example.com' });
@@ -71,6 +71,6 @@ test('creates the first user with id 1', async () => {
 });
 ```
 
-**Horizontal slicing** — writing the whole shape of the test suite before any implementation exists, e.g. stubbing out `test.todo(...)` for every CRUD verb on `/users` before `list_users.js` or `update_user.js` exist. This locks in an imagined shape and produces tests insensitive to what the implementation actually turns out to need. Work one seam, one test, one minimal implementation at a time instead (see the mode files under `modes/`).
+**Horizontal slicing** — writing the whole shape of the test suite before any implementation exists, e.g. stubbing out `test.todo(...)` for every CRUD verb before most of the handlers exist. This locks in an imagined shape and produces tests insensitive to what the implementation actually turns out to need. Work one seam, one test, one minimal implementation at a time instead (see the mode files under `modes/`).
 
 **Side-channel verification** — same failure as the implementation-coupled example above, generalized: whenever a test's assertion reads from somewhere other than the seam it just called (a shared array, a log line, a private field), it's checking a side channel instead of the interface.

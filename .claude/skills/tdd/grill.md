@@ -10,7 +10,7 @@ Ask in this order because each round can depend on the answer to the round befor
 2. **Seam** — Which public boundary is that observable at? (See [seams.md](seams.md).) e.g. `POST /register` via `request(app)`, or `password_checker.js:checkPasswordStrength` via a direct `require`.
 3. **Reality** — What's real in the test, what's faked? Only system boundaries get faked (see [mocking.md](mocking.md)) — e.g. "real Express app, real in-memory `users` store, no external calls to fake."
 4. **Expected value** — What exactly comes out, **and where did that value come from?** (See readiness item 5 — provenance is mandatory.)
-5. **Slice order** — Which tracer bullet goes first? Smallest observable slice that proves the seam wired correctly, not the whole feature at once. Name each slice as the literal string that will go inside `test(...)`, in this repo's convention: **`should <expected outcome> when <condition>`** — start with "should", state the observable result (status code and/or shape) before the triggering condition. Not a paraphrase, and not prefixed with the `describe(...)` block's title (that context is already implied by nesting) — e.g. `should return 200 with an empty envelope when no users exist`, not `returns an empty envelope when no users exist` or `GET /users returns an empty envelope when no users exist`. Both `templates/test-plan.md`'s Slices section and `templates/card-comment.md`'s slice list must carry this exact string, so a reviewer can diff the plan against the real test file without translating.
+5. **Slice order** — Which tracer bullet goes first? Smallest observable slice that proves the seam wired correctly, not the whole feature at once. Name each slice as the literal string that will go inside `test(...)`, matching whatever test-naming convention the project already uses (discovered while reading neighbouring tests per readiness item 4) — e.g. one common convention is **`should <expected outcome> when <condition>`**: start with "should", state the observable result (status code and/or shape) before the triggering condition, not prefixed with the `describe(...)` block's title (that context is already implied by nesting) — `should return 200 with an empty envelope when no users exist`, not `returns an empty envelope when no users exist` or `GET /users returns an empty envelope when no users exist`. If the project has no existing convention, propose one and confirm it with the user. Both `templates/test-plan.md`'s Slices section and `templates/card-comment.md`'s slice list must carry this exact string, so a reviewer can diff the plan against the real test file without translating.
 
 ## Rules
 
@@ -35,7 +35,7 @@ followed by an `AskUserQuestion` call with options `Go with the recommendation (
 - **Facts are never asked of the user.** Anything discoverable — does this file exist, what does the test runner print, what branch are we on — is dispatched to `scripts/ground.sh` or `scripts/find-seam.sh`, not asked. Only ask about **decisions**: what should happen, what's in scope, what's the right seam among candidates.
 - **Question 4 (expected value) is mandatory and never skipped.** If the answer is "whatever the function returns" or "I'll run it and see," that's a forming tautological test (readiness item 5 / provenance). Name it as such and re-ask — don't accept it and move on.
 
-## Worked example — round 1, on this repo
+## Worked example — round 1
 
 Card: *"As a user, I want `checkPasswordStrength` to return `'strong'` for passwords of 12+ characters that mix case and digits, so the register endpoint can reject weak passwords."*
 
@@ -53,7 +53,7 @@ Turn 1 — only Q1 is shown, then the tool call:
 Say the user picks **Go with the recommendation**. Turn 2 — only Q2:
 
 ```
-❓ **Q2** - **Seam**: `password_checker.js:checkPasswordStrength`, called directly (as `__tests__/password_checker.test.js` already does), or through `POST /register`?
+❓ **Q2** - **Seam**: `password_checker.js:checkPasswordStrength`, called directly (matching this project's existing plain-function test convention), or through `POST /register`?
 
 ➡️ `password_checker.js:checkPasswordStrength` directly — it's the outermost boundary where this specific behavior is observable; `register.js` doesn't call it yet, so testing through the route would be testing code that doesn't exist.
 ```

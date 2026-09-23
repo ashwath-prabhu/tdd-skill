@@ -1,9 +1,11 @@
 ---
-name: tdd-kanban
-description: Guides test-first development driven by a Kanban card. Use when writing tests, doing TDD or red-green-refactor, working a story/bug/task card, or adding tests to existing code.
+name: tdd
+description: Guides test-first development for JavaScript/TypeScript projects, driven by a card (story, bug, or task). Use when writing tests, doing TDD or red-green-refactor, working a story/bug/task card, or adding tests to existing code.
 ---
 
-# TDD (Kanban-driven)
+# TDD
+
+Scoped to **JavaScript/TypeScript** projects — the loop itself is language-agnostic in principle, but this skill's scripts (test-runner detection, the characterization-test proof, mutation checks) assume a JS/TS toolchain (`package.json`, npm/yarn/pnpm, a JS test runner such as Jest/Vitest/Mocha). Don't use it as-is on a non-JS repo.
 
 This skill runs a card through a grilled, test-first loop with eleven mandatory states, in order:
 

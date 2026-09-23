@@ -12,7 +12,7 @@ The team's default failure mode: code got written first, no test exists yet, but
 2. Run it. It should pass immediately, since the code already exists.
 3. **Required, non-skippable:** run `scripts/prove-test.sh <test-file> <source-file>`. It deliberately breaks the source (inverts a condition or hardcodes a return), confirms the test goes red, then restores it and confirms green again. If the test stays green while the logic is gutted, the test isn't testing anything — fix the test before moving on.
 
-Example: `routes/create_user.js` was written without a test.
+Example: a route handler was written without a test.
 
 ```javascript
 test('POST /users creates a user and returns 201', async () => {

@@ -77,8 +77,8 @@ if [ "$HITS_FOUND" = false ]; then
   echo
   echo "WRONG-REPO WARNING: none of the given domain nouns (${NOUNS[*]}) appear anywhere in this"
   echo "repository (excluding node_modules/.git). Before proceeding, confirm this is the right"
-  echo "repo/package for this card — see CONTEXT.md's component -> repo mapping, or ask the user"
-  echo "once and persist the answer there."
+  echo "repo/package for this card — check CONTEXT.md's component -> repo mapping if one exists,"
+  echo "or ask the user once and persist the answer there."
   exit 1
 fi
 
